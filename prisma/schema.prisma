@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../app/generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [pg_trgm]
+}
+
+enum Role {
+  AGENT
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum LeadStatus {
+  NEW
+  INTERESTED
+  NOT_INTERESTED
+  DO_NOT_CALL
+  CALLBACK
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         Role       @default(AGENT)
+  status       UserStatus @default(ACTIVE)
+  deletedAt    DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  assignedContacts Contact[]  @relation("AssignedAgent")
+  notes            Note[]
+  auditLogs        AuditLog[]
+
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Contact {
+  id           String     @id @default(cuid())
+  name         String
+  phone        String?
+  email        String?
+  status       LeadStatus @default(NEW)
+  callbackDate DateTime?
+  deletedAt    DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  assignedAgentId String?
+  assignedAgent   User?   @relation("AssignedAgent", fields: [assignedAgentId], references: [id])
+
+  notes Note[]
+
+  @@index([status])
+  @@index([assignedAgentId])
+  @@index([callbackDate])
+  @@index([deletedAt])
+  @@map("contacts")
+}
+
+model Note {
+  id        String    @id @default(cuid())
+  contactId String
+  contact   Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  agentId   String
+  agent     User      @relation(fields: [agentId], references: [id])
+  body      String    @db.Text
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([contactId, createdAt])
+  @@index([deletedAt])
+  @@map("notes")
+}
+
+// Append-only record of admin actions for accountability (requirement: data
+// security/accountability via individual logins). targetId/targetLabel are
+// stored as plain strings (not a typed relation) since a single log spans
+// three different target model types and must stay legible even if the
+// target itself is later restored or permanently removed.
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorId     String
+  actor       User     @relation(fields: [actorId], references: [id])
+  action      String
+  targetType  String
+  targetId    String
+  targetLabel String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Designbydial CRM
 
-## Getting Started
+A lead and call management CRM built for a small IT sales team. Agents can look up contacts before calling (to avoid duplicate outreach), log call notes, and tag leads by status. Admins manage users, review pipeline KPIs, and audit activity.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Duplicate-safe contact search** — debounced search by phone or email, with a soft warning (not a hard block) when creating a contact that looks like an existing one.
+- **Lead status tracking** — New / Interested / Not Interested / Do Not Call / Callback, with a callback date picker and overdue/today highlighting.
+- **Call notes** — chronological note history per contact, sortable oldest/newest first.
+- **Segmented lead lists** — one list per status, filterable by agent and date range, exportable to CSV.
+- **CSV bulk import** — upload a CSV of leads to create contacts in bulk.
+- **Role-based access** — Agent vs Admin, enforced both in the UI and at the API layer.
+- **Admin tools** — user management (create, deactivate, change role, reset password, delete), a pipeline/activity overview dashboard, an audit log of admin actions, and a trash with restore for soft-deleted users/contacts/notes.
+- **Password management** — agents can change their own password from the Account page; admins can issue a temporary password to any agent from the Users page. No email dependency.
+- Responsive layout — usable on mobile, tablet, and laptop screens.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [Next.js 16](https://nextjs.org) (App Router, Turbopack), React 19, TypeScript
+- PostgreSQL via [Prisma 7](https://www.prisma.io) (driver adapters) — built and tested against [Neon](https://neon.tech)
+- [NextAuth (Auth.js) v5](https://authjs.dev) with the Credentials provider, JWT sessions
+- Tailwind CSS v4
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Getting started
 
-## Learn More
+1. Install dependencies:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Copy `.env.example` to `.env` and fill in the values:
+   - `DATABASE_URL` / `DIRECT_URL` — Neon (or any Postgres) connection strings; `DATABASE_URL` should be the pooled connection, `DIRECT_URL` the direct one (used by Prisma Migrate).
+   - `AUTH_SECRET` — generate with `npx auth secret`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Apply the database schema and seed an admin user:
 
-## Deploy on Vercel
+   ```bash
+   npx prisma migrate dev
+   npm run db:seed
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. Start the dev server:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) and sign in with the seeded admin account (see `prisma/seed.ts` for credentials — change the password after first login).
+
+## Scripts
+
+| Script            | Description                                                                 |
+| ----------------- | --------------------------------------------------------------------------- |
+| `npm run dev`     | Start the dev server (Turbopack)                                            |
+| `npm run build`   | `prisma generate && prisma migrate deploy && next build` — used for deploys |
+| `npm run start`   | Start the production server                                                 |
+| `npm run lint`    | Run ESLint                                                                  |
+| `npm run db:seed` | Seed the database (creates the initial admin user)                          |
