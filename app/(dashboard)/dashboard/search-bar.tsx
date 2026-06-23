@@ -80,7 +80,7 @@ export function SearchBar() {
             <button
               key={c.id}
               onClick={() => router.push(`/contacts/${c.id}`)}
-              className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-zinc-50"
+              className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-zinc-50"
             >
               <div>
                 <p className="font-medium text-zinc-900">{c.name}</p>

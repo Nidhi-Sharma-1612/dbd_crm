@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Lock } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export function ChangePasswordForm() {
           id="currentPassword"
           required
           autoComplete="current-password"
+          leftIcon={<Lock size={16} />}
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
         />
@@ -57,6 +59,7 @@ export function ChangePasswordForm() {
           minLength={8}
           autoComplete="new-password"
           placeholder="Min. 8 characters"
+          leftIcon={<Lock size={16} />}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
         />

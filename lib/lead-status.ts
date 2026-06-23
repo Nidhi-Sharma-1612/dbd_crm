@@ -17,6 +17,16 @@ export const STATUS_COLORS: Record<LeadStatus, string> = {
   CALLBACK: "bg-amber-100 text-amber-700",
 };
 
+// Softer tint used for icon badges (page headers, KPI cards) — same hue family
+// as STATUS_COLORS but lighter, since those badges sit on white cards.
+export const STATUS_ICON_BG: Record<LeadStatus, string> = {
+  NEW: "bg-zinc-100 text-zinc-600",
+  INTERESTED: "bg-green-50 text-green-600",
+  NOT_INTERESTED: "bg-zinc-100 text-zinc-500",
+  DO_NOT_CALL: "bg-red-50 text-red-600",
+  CALLBACK: "bg-amber-50 text-amber-600",
+};
+
 // URL slug <-> enum mapping for /lists/[status] routes. Excludes NEW since it's a
 // pre-triage state, not one of the four list views requested in the doc.
 export const LIST_SLUGS: Record<string, LeadStatus> = {

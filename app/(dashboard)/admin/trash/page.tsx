@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { RestoreButton } from "./restore-button";
 
 export const dynamic = "force-dynamic";
@@ -29,12 +30,12 @@ export default async function TrashPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">Trash</h1>
-        <p className="text-sm text-zinc-500">
-          Deleted users, contacts, and notes are kept here until restored.
-        </p>
-      </div>
+      <PageHeader
+        icon={<Trash2 size={18} />}
+        iconClassName="bg-red-50 text-red-600"
+        title="Trash"
+        subtitle="Deleted users, contacts, and notes are kept here until restored."
+      />
 
       <h2 className="mb-2 text-sm font-medium text-zinc-700">Users ({trashedUsers.length})</h2>
       <Card className="mb-6 overflow-hidden">

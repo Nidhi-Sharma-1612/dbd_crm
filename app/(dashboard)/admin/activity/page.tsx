@@ -1,6 +1,7 @@
 import { History } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { describeAction } from "@/lib/audit-labels";
 
 export const dynamic = "force-dynamic";
@@ -21,10 +22,11 @@ export default async function ActivityLogPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">Activity</h1>
-        <p className="text-sm text-zinc-500">Most recent admin actions, newest first (last 200).</p>
-      </div>
+      <PageHeader
+        icon={<History size={18} />}
+        title="Activity"
+        subtitle="Most recent admin actions, newest first (last 200)."
+      />
 
       <Card className="overflow-hidden">
         {logs.length === 0 ? (

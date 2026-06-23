@@ -1,15 +1,25 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Download, Inbox } from "lucide-react";
+import { Download, Inbox, ThumbsUp, ThumbsDown, PhoneOff, CalendarClock } from "lucide-react";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { slugToStatus, STATUS_LABELS } from "@/lib/lead-status";
+import { slugToStatus, STATUS_LABELS, STATUS_ICON_BG, type LeadStatus } from "@/lib/lead-status";
 import { Card } from "@/components/ui/card";
 import { buttonClassName } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
+
+const STATUS_ICONS: Record<LeadStatus, React.ReactNode> = {
+  NEW: <ThumbsUp size={18} />,
+  INTERESTED: <ThumbsUp size={18} />,
+  NOT_INTERESTED: <ThumbsDown size={18} />,
+  DO_NOT_CALL: <PhoneOff size={18} />,
+  CALLBACK: <CalendarClock size={18} />,
+};
 
 function callbackBadge(date: Date | null) {
   if (!date) return <span className="text-zinc-400">Not scheduled</span>;
@@ -37,8 +47,18 @@ export default async function LeadListPage({
   const status = slugToStatus(slug);
   if (!status) notFound();
 
+  const session = await auth();
+  const isAdmin = session?.user.role === "ADMIN";
+
+  // Agents only ever see their own leads here; the agent filter below is
+  // admin-only, so any "agent" query param is ignored for non-admins rather
+  // than trusted from the URL.
   const where: Prisma.ContactWhereInput = { status, deletedAt: null };
-  if (agent) where.assignedAgentId = agent;
+  if (isAdmin) {
+    if (agent) where.assignedAgentId = agent;
+  } else {
+    where.assignedAgentId = session?.user.id;
+  }
   if (from || to) {
     where.updatedAt = {
       ...(from ? { gte: new Date(from) } : {}),
@@ -55,46 +75,52 @@ export default async function LeadListPage({
           ? [{ callbackDate: { sort: "asc", nulls: "last" } }]
           : [{ updatedAt: "desc" }],
     }),
-    prisma.user.findMany({
-      where: { deletedAt: null },
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    }),
+    isAdmin
+      ? prisma.user.findMany({
+          where: { deletedAt: null },
+          select: { id: true, name: true },
+          orderBy: { name: "asc" },
+        })
+      : Promise.resolve([]),
   ]);
 
   const exportQuery = new URLSearchParams();
-  if (agent) exportQuery.set("agent", agent);
+  if (isAdmin && agent) exportQuery.set("agent", agent);
   if (from) exportQuery.set("from", from);
   if (to) exportQuery.set("to", to);
   const exportHref = `/api/lists/${slug}/export${exportQuery.size ? `?${exportQuery}` : ""}`;
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-zinc-900">{STATUS_LABELS[status]} leads</h1>
-          <p className="text-sm text-zinc-500">{contacts.length} contact{contacts.length === 1 ? "" : "s"}</p>
-        </div>
-        <a href={exportHref} className={buttonClassName("outline", "sm")}>
-          <Download size={14} />
-          Export CSV
-        </a>
-      </div>
+      <PageHeader
+        icon={STATUS_ICONS[status]}
+        iconClassName={STATUS_ICON_BG[status]}
+        title={`${STATUS_LABELS[status]} leads`}
+        subtitle={`${contacts.length} contact${contacts.length === 1 ? "" : "s"}`}
+        actions={
+          <a href={exportHref} className={buttonClassName("outline", "sm")}>
+            <Download size={14} />
+            Export CSV
+          </a>
+        }
+      />
 
       <form method="get" className="mb-4 flex flex-wrap items-end gap-3">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="agent" className="text-xs font-medium text-zinc-500">
-            Agent
-          </label>
-          <Select id="agent" name="agent" defaultValue={agent ?? ""} className="w-44">
-            <option value="">All agents</option>
-            {agents.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </Select>
-        </div>
+        {isAdmin && (
+          <div className="flex flex-col gap-1">
+            <label htmlFor="agent" className="text-xs font-medium text-zinc-500">
+              Agent
+            </label>
+            <Select id="agent" name="agent" defaultValue={agent ?? ""} className="w-44">
+              <option value="">All users</option>
+              {agents.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
         <div className="flex flex-col gap-1">
           <label htmlFor="from" className="text-xs font-medium text-zinc-500">
             Updated from
@@ -140,7 +166,7 @@ export default async function LeadListPage({
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {contacts.map((c) => (
-                <tr key={c.id} className="hover:bg-zinc-50">
+                <tr key={c.id} className="transition-colors hover:bg-zinc-50">
                   <td className="px-4 py-2.5">
                     <Link href={`/contacts/${c.id}`} className="font-medium text-zinc-900 hover:text-indigo-600 hover:underline">
                       {c.name}

@@ -16,9 +16,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ status: 
   const agent = searchParams.get("agent");
   const from = searchParams.get("from");
   const to = searchParams.get("to");
+  const isAdmin = session.user.role === "ADMIN";
 
   const where: Prisma.ContactWhereInput = { status, deletedAt: null };
-  if (agent) where.assignedAgentId = agent;
+  if (isAdmin) {
+    if (agent) where.assignedAgentId = agent;
+  } else {
+    where.assignedAgentId = session.user.id;
+  }
   if (from || to) {
     where.updatedAt = {
       ...(from ? { gte: new Date(from) } : {}),

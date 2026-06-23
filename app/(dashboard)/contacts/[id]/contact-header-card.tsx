@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { getInitials } from "@/lib/initials";
 
 type Contact = {
   id: string;
@@ -144,43 +145,48 @@ export function ContactHeaderCard({
   return (
     <Card className="mb-6 p-4 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">{contact.name}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
-            {contact.phone && (
-              <span className="flex items-center gap-1.5">
-                <Phone size={14} /> {contact.phone}
-              </span>
-            )}
-            {contact.email && (
-              <span className="flex items-center gap-1.5">
-                <Mail size={14} /> {contact.email}
-              </span>
-            )}
-            {isAdmin ? (
-              <span className="flex items-center gap-1.5">
-                <User size={14} />
-                <Select
-                  value={contact.assignedAgentId ?? ""}
-                  disabled={reassigning}
-                  onChange={(e) => handleReassign(e.target.value)}
-                  className="w-auto py-1 text-sm"
-                >
-                  <option value="">Unassigned</option>
-                  {agents.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </Select>
-              </span>
-            ) : (
-              contact.assignedAgentName && (
+        <div className="flex items-start gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-base font-semibold text-indigo-700">
+            {getInitials(contact.name)}
+          </span>
+          <div>
+            <h1 className="text-2xl font-semibold text-zinc-900">{contact.name}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
+              {contact.phone && (
                 <span className="flex items-center gap-1.5">
-                  <User size={14} /> {contact.assignedAgentName}
+                  <Phone size={14} /> {contact.phone}
                 </span>
-              )
-            )}
+              )}
+              {contact.email && (
+                <span className="flex items-center gap-1.5">
+                  <Mail size={14} /> {contact.email}
+                </span>
+              )}
+              {isAdmin ? (
+                <span className="flex items-center gap-1.5">
+                  <User size={14} />
+                  <Select
+                    value={contact.assignedAgentId ?? ""}
+                    disabled={reassigning}
+                    onChange={(e) => handleReassign(e.target.value)}
+                    className="w-auto py-1 text-sm"
+                  >
+                    <option value="">Unassigned</option>
+                    {agents.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                  </Select>
+                </span>
+              ) : (
+                contact.assignedAgentName && (
+                  <span className="flex items-center gap-1.5">
+                    <User size={14} /> {contact.assignedAgentName}
+                  </span>
+                )
+              )}
+            </div>
           </div>
         </div>
 

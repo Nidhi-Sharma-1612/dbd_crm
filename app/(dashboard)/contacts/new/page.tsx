@@ -2,12 +2,13 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, UserPlus } from "lucide-react";
 import { STATUS_LABELS, STATUS_COLORS, type LeadStatus } from "@/lib/lead-status";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 
 type Duplicate = { id: string; name: string; phone: string | null; email: string | null; status: LeadStatus };
 
@@ -58,8 +59,7 @@ function NewContactForm() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="mb-1 text-xl font-semibold text-zinc-900">New contact</h1>
-      <p className="mb-6 text-sm text-zinc-500">Add a new lead to the system.</p>
+      <PageHeader icon={<UserPlus size={18} />} title="New contact" subtitle="Add a new lead to the system." />
 
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -90,7 +90,7 @@ function NewContactForm() {
               <li key={d.id}>
                 <button
                   onClick={() => router.push(`/contacts/${d.id}`)}
-                  className="flex w-full items-center justify-between rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-left hover:bg-zinc-50"
+                  className="flex w-full items-center justify-between rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-left transition-colors hover:bg-zinc-50"
                 >
                   <div>
                     <p className="font-medium text-zinc-900">{d.name}</p>

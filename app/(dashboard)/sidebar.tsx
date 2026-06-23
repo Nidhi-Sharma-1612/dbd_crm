@@ -1,18 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { PhoneCall, Search, ListChecks, LayoutDashboard, Users, Trash2, History, LogOut, Settings, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { PhoneCall, Search, ListChecks, LayoutDashboard, Users, Trash2, History, Settings, Menu, X } from "lucide-react";
+import { getInitials } from "@/lib/initials";
 import { NavLink } from "./nav-link";
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 export function Sidebar({
   userName,
@@ -26,11 +17,7 @@ export function Sidebar({
   signOutForm: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  const close = () => setOpen(false);
 
   return (
     <>
@@ -82,13 +69,13 @@ export function Sidebar({
         </div>
 
         <nav className="flex flex-col gap-1 px-3">
-          <NavLink href="/dashboard" icon={<Search size={16} />}>
+          <NavLink href="/dashboard" icon={<Search size={16} />} onClick={close}>
             Search
           </NavLink>
-          <NavLink href="/lists/interested" icon={<ListChecks size={16} />} activeMatch="/lists">
+          <NavLink href="/lists/interested" icon={<ListChecks size={16} />} activeMatch="/lists" onClick={close}>
             Lists
           </NavLink>
-          <NavLink href="/account" icon={<Settings size={16} />} activeMatch="/account">
+          <NavLink href="/account" icon={<Settings size={16} />} activeMatch="/account" onClick={close}>
             Account
           </NavLink>
           {isAdmin && (
@@ -96,16 +83,16 @@ export function Sidebar({
               <p className="mb-1 mt-4 px-3 text-xs font-medium uppercase tracking-wide text-zinc-400">
                 Admin
               </p>
-              <NavLink href="/admin/overview" icon={<LayoutDashboard size={16} />} activeMatch="/admin/overview">
+              <NavLink href="/admin/overview" icon={<LayoutDashboard size={16} />} activeMatch="/admin/overview" onClick={close}>
                 Overview
               </NavLink>
-              <NavLink href="/admin/users" icon={<Users size={16} />} activeMatch="/admin/users">
+              <NavLink href="/admin/users" icon={<Users size={16} />} activeMatch="/admin/users" onClick={close}>
                 Users
               </NavLink>
-              <NavLink href="/admin/trash" icon={<Trash2 size={16} />} activeMatch="/admin/trash">
+              <NavLink href="/admin/trash" icon={<Trash2 size={16} />} activeMatch="/admin/trash" onClick={close}>
                 Trash
               </NavLink>
-              <NavLink href="/admin/activity" icon={<History size={16} />} activeMatch="/admin/activity">
+              <NavLink href="/admin/activity" icon={<History size={16} />} activeMatch="/admin/activity" onClick={close}>
                 Activity
               </NavLink>
             </>
@@ -115,7 +102,7 @@ export function Sidebar({
         <div className="mt-auto border-t border-zinc-200 p-3">
           <div className="flex items-center gap-2.5 rounded-md px-2 py-2">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-xs font-semibold text-zinc-600">
-              {userName ? initials(userName) : "?"}
+              {userName ? getInitials(userName) : "?"}
             </span>
             <div className="flex-1 overflow-hidden">
               <p className="truncate text-sm font-medium text-zinc-900">{userName}</p>

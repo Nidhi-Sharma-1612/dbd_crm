@@ -1,6 +1,7 @@
-import { Users, Sparkles, ThumbsUp, ThumbsDown, PhoneOff, CalendarClock, PhoneCall } from "lucide-react";
+import { LayoutDashboard, Users, Sparkles, ThumbsUp, ThumbsDown, PhoneOff, CalendarClock, PhoneCall } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -15,15 +16,17 @@ function PipelineStat({
   label,
   value,
   subtext,
+  iconClassName = "bg-indigo-50 text-indigo-600",
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   subtext?: string;
+  iconClassName?: string;
 }) {
   return (
-    <Card className="flex items-center gap-3 p-4">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+    <Card className="flex items-center gap-3 p-4 transition-shadow hover:shadow-md">
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconClassName}`}>
         {icon}
       </span>
       <div>
@@ -78,25 +81,45 @@ export default async function OverviewPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">Overview</h1>
-        <p className="text-sm text-zinc-500">
-          {today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-        </p>
-      </div>
+      <PageHeader
+        icon={<LayoutDashboard size={18} />}
+        title="Overview"
+        subtitle={today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+      />
 
       <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-400">Pipeline</h2>
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <PipelineStat icon={<Users size={16} />} label="Total contacts" value={totalContacts} />
-        <PipelineStat icon={<Sparkles size={16} />} label="New" value={newUntriaged} />
-        <PipelineStat icon={<ThumbsUp size={16} />} label="Interested" value={interested} />
-        <PipelineStat icon={<ThumbsDown size={16} />} label="Not interested" value={notInterested} />
-        <PipelineStat icon={<PhoneOff size={16} />} label="Do not call" value={doNotCall} />
+        <PipelineStat
+          icon={<Sparkles size={16} />}
+          label="New"
+          value={newUntriaged}
+          iconClassName="bg-zinc-100 text-zinc-600"
+        />
+        <PipelineStat
+          icon={<ThumbsUp size={16} />}
+          label="Interested"
+          value={interested}
+          iconClassName="bg-green-50 text-green-600"
+        />
+        <PipelineStat
+          icon={<ThumbsDown size={16} />}
+          label="Not interested"
+          value={notInterested}
+          iconClassName="bg-zinc-100 text-zinc-500"
+        />
+        <PipelineStat
+          icon={<PhoneOff size={16} />}
+          label="Do not call"
+          value={doNotCall}
+          iconClassName="bg-red-50 text-red-600"
+        />
         <PipelineStat
           icon={<CalendarClock size={16} />}
           label="Callback"
           value={callback}
           subtext={overdueCallbacks > 0 ? `${overdueCallbacks} overdue` : undefined}
+          iconClassName="bg-amber-50 text-amber-600"
         />
       </div>
 

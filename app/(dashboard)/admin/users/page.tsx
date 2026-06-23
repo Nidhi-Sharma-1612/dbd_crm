@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Users } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { buttonClassName } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { UserRow } from "./user-row";
 
 export const dynamic = "force-dynamic";
@@ -19,16 +20,17 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-zinc-900">Users</h1>
-          <p className="text-sm text-zinc-500">{users.length} account{users.length === 1 ? "" : "s"}</p>
-        </div>
-        <Link href="/admin/users/new" className={buttonClassName("primary", "sm")}>
-          <UserPlus size={14} />
-          New user
-        </Link>
-      </div>
+      <PageHeader
+        icon={<Users size={18} />}
+        title="Users"
+        subtitle={`${users.length} account${users.length === 1 ? "" : "s"}`}
+        actions={
+          <Link href="/admin/users/new" className={buttonClassName("primary", "sm")}>
+            <UserPlus size={14} />
+            New user
+          </Link>
+        }
+      />
 
       <Card className="overflow-x-auto">
         <table className="w-full min-w-160 text-sm">

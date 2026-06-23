@@ -4,16 +4,25 @@ import { useState, forwardRef, type InputHTMLAttributes } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "./input";
 
-export const PasswordInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
-  ({ className = "", ...props }, ref) => {
+type PasswordInputProps = InputHTMLAttributes<HTMLInputElement> & {
+  leftIcon?: React.ReactNode;
+};
+
+export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ className = "", leftIcon, ...props }, ref) => {
     const [visible, setVisible] = useState(false);
 
     return (
       <div className="relative">
+        {leftIcon && (
+          <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
+            {leftIcon}
+          </span>
+        )}
         <Input
           ref={ref}
           type={visible ? "text" : "password"}
-          className={`pr-10 ${className}`}
+          className={`pr-10 ${leftIcon ? "pl-10" : ""} ${className}`}
           {...props}
         />
         <button

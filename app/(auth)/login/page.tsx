@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { Mail, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
@@ -47,14 +48,18 @@ function LoginForm() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <div className="relative">
+            <Mail size={16} className="pointer-events-none absolute inset-y-0 left-3 my-auto text-zinc-400" />
+            <Input
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              className="pl-10"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="password">Password</Label>
@@ -62,6 +67,7 @@ function LoginForm() {
             id="password"
             required
             autoComplete="current-password"
+            leftIcon={<Lock size={16} />}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

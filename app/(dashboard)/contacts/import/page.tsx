@@ -6,6 +6,7 @@ import Papa from "papaparse";
 import { UploadCloud } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 
 type ParsedRow = { name?: string; phone?: string; email?: string };
 type ImportResult = { created: number; skipped: { row: number; reason: string }[] };
@@ -75,13 +76,18 @@ export default function ImportContactsPage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="mb-1 text-xl font-semibold text-zinc-900">Import contacts</h1>
-      <p className="mb-6 text-sm text-zinc-500">
-        Upload a CSV with <code className="rounded bg-zinc-100 px-1 py-0.5">Name</code>,{" "}
-        <code className="rounded bg-zinc-100 px-1 py-0.5">Phone</code>, and{" "}
-        <code className="rounded bg-zinc-100 px-1 py-0.5">Email</code> columns — the same format
-        the lead-list export uses.
-      </p>
+      <PageHeader
+        icon={<UploadCloud size={18} />}
+        title="Import contacts"
+        subtitle={
+          <>
+            Upload a CSV with <code className="rounded bg-zinc-100 px-1 py-0.5">Name</code>,{" "}
+            <code className="rounded bg-zinc-100 px-1 py-0.5">Phone</code>, and{" "}
+            <code className="rounded bg-zinc-100 px-1 py-0.5">Email</code> columns — the same format
+            the lead-list export uses.
+          </>
+        }
+      />
 
       <Card className="p-6">
         <label
