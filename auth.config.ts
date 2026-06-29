@@ -4,6 +4,10 @@ import type { NextAuthConfig } from "next-auth";
 // that need Node APIs (Prisma, bcrypt) live in lib/auth.ts instead, since
 // Next.js middleware runs in the Edge runtime and can't bundle them.
 export default {
+  // Vercel auto-detects its own host as trusted; other hosts (e.g. Hostinger)
+  // don't, and NextAuth rejects every request with "UntrustedHost" otherwise —
+  // which hangs every page since proxy.ts calls auth() on each request.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [],
